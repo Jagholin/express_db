@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUsers, getUser, postUser, putUser, deleteUser, getUserOrders } from "../controllers/users.js";
+import { getUsers, getUser, postUser, putUser, deleteUser, getUserOrders, checkInactiveUsers } from "../controllers/users.js";
 import { body } from "express-validator";
 
 const route = new Router();
@@ -10,5 +10,6 @@ route.post("/", body("firstName").isString(), body("lastName").isString(), body(
 route.put("/:id", body("firstName").isString(), body("lastName").isString(), body("age").isInt({gt: 0, lt: 100}), putUser);
 route.delete("/:id", deleteUser);
 route.get("/:id/orders", getUserOrders);
+route.put("/:id/check-inactive", checkInactiveUsers);
 
 export default route;

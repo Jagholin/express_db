@@ -90,3 +90,17 @@ export async function getUserOrders (req, res) {
         res.status(500).send(err.message);
     }
 }
+
+export async function checkInactiveUsers (req, res) {
+    try {
+        const id = req.params.id;
+        const result = await pool.query('UPDATE users u SET active=EXISTS(SELECT * FROM orders WHERE user_id=u.id) WHERE id=$1 RETURNING *;', [id]);
+        if (result.rowCount === 0) {
+            res.sendStatus(404);
+        } else {
+            res.send(result.rows);
+        }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+}
