@@ -1,4 +1,5 @@
 import pool from "../db/postgres.js";
+import { validationResult } from "express-validator";
 
 export async function getOrders (req, res) {
     try {
@@ -29,6 +30,11 @@ export async function getOrder (req, res) {
 
 export async function postOrder (req, res) {
     try {
+        const errors = validationResult(req);
+        if (! errors.isEmpty()) {
+            res.status(400).send(errors.array());
+            return;
+        }
         const { price, date, userId } = req.body;
         const result = await pool.query('INSERT INTO orders (price, date, user_id) VALUES ($1, $2, $3) RETURNING *', [price, new Date(date), userId]);
         res.status(201).send(result.rows);
@@ -39,6 +45,11 @@ export async function postOrder (req, res) {
 
 export async function putOrder (req, res) {
     try {
+        const errors = validationResult(req);
+        if (! errors.isEmpty()) {
+            res.status(400).send(errors.array());
+            return;
+        }
         const { price, date, userId } = req.body;
         const id = req.params.id;
         const result = await pool.query('UPDATE orders SET price=$1, date=$2, user_id=$3 WHERE id=$4 RETURNING *', [price, new Date(date), userId, id]);

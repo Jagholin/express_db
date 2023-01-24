@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import pool from "../db/postgres.js";
 
 export async function getUsers (req, res) {
@@ -29,6 +30,11 @@ export async function getUser (req, res) {
 
 export async function postUser (req, res) {
     try {
+        const errors = validationResult(req);
+        if (! errors.isEmpty()) {
+            res.status(400).send(errors.array());
+            return;
+        }
         const { firstName, lastName, age } = req.body;
         const result = await pool.query('INSERT INTO users (first_name, last_name, age) VALUES ($1, $2, $3) RETURNING *', [firstName, lastName, age]);
         res.status(201).send(result.rows);
@@ -39,6 +45,11 @@ export async function postUser (req, res) {
 
 export async function putUser (req, res) {
     try {
+        const errors = validationResult(req);
+        if (! errors.isEmpty()) {
+            res.status(400).send(errors.array());
+            return;
+        }
         const { firstName, lastName, age } = req.body;
         const id = req.params.id;
         const result = await pool.query('UPDATE users SET first_name=$1, last_name=$2, age=$3 WHERE id=$4 RETURNING *', [firstName, lastName, age, id]);
