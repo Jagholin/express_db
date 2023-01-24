@@ -76,3 +76,17 @@ export async function deleteUser (req, res) {
         res.status(500).send(err.message);
     }
 }
+
+export async function getUserOrders (req, res) {
+    try {
+        const id = req.params.id;
+        const result = await pool.query('SELECT * from orders WHERE user_id=$1', [id]);
+        if (result.rowCount === 0) {
+            res.sendStatus(404);
+        } else {
+            res.send(result.rows);
+        }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+}
